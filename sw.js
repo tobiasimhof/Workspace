@@ -2,12 +2,16 @@
 // Strategie für eigene Dateien: Netzwerk zuerst, Cache nur als Offline-Fallback.
 // So kommen Änderungen von GitHub Pages beim nächsten Öffnen sofort an.
 // CACHE_NAME nur hochzählen, wenn sich CORE_ASSETS oder diese Datei ändern.
-const CACHE_NAME = 'workspace-v2';
+const CACHE_NAME = 'workspace-v3';
 const CORE_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './icon.svg'
+  './icon.svg',
+  './icon-192.png',
+  './icon-512.png',
+  './icon-maskable-512.png',
+  './apple-touch-icon.png'
 ];
 // Bei sehr langsamem Netz nach dieser Zeit lieber die gecachte Version zeigen.
 const NETWORK_TIMEOUT_MS = 4000;
