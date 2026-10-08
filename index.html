@@ -276,6 +276,16 @@
   .menu-pop button:hover { background:var(--bg); }
   .menu-pop button.danger { color:#CC4B4B; }
   .menu-pop button.danger:hover { background:#FBEDED; }
+
+  /* HINWEISE */
+  .notice { display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px 10px 16px; margin-bottom:16px; font-size:13px; }
+  .notice-text { flex:1; min-width:200px; }
+  .notice-text span { display:block; font-size:12px; color:var(--muted); }
+  .notice-actions { display:flex; gap:8px; }
+  .notice .btn-primary, .notice .btn-ghost { padding:6px 14px; }
+  .toast { display:none; position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:400; align-items:center; gap:12px; background:var(--accent); color:#fff; border-radius:99px; padding:6px 6px 6px 18px; font-size:13px; box-shadow:0 10px 28px rgba(0,0,0,0.2); white-space:nowrap; }
+  .toast.open { display:flex; animation:slideUp 0.2s ease; }
+  .toast button { background:#fff; color:var(--accent); border:none; border-radius:99px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; }
 </style>
 </head>
 <body>
@@ -328,10 +338,17 @@
       </div>
     </aside>
     <div class="main-content">
+      <div id="backupNotice"></div>
       <div class="stats" id="statsBar"></div>
       <div class="categories" id="categoriesGrid"></div>
     </div>
   </div>
+</div>
+
+<!-- UPDATE-HINWEIS -->
+<div class="toast" id="updateToast">
+  Neue Version verfügbar
+  <button onclick="location.reload()">Neu laden</button>
 </div>
 
 <!-- DETAIL -->
@@ -598,7 +615,9 @@ function save() {
 }
 
 // ═══════════ DATES & RECURRENCE ═══════════
-const today = new Date(); today.setHours(0,0,0,0);
+function startOfToday() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+// Wird bei Tageswechsel neu gesetzt (siehe refreshToday), falls die App über Nacht offen bleibt.
+let today = startOfToday();
 const DAYS_DE = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 const DAYS_DE_LONG = ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
 const MONTHS_DE = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -763,8 +782,26 @@ function getUrgency(item, cat, dateOverride) {
   return 'green';
 }
 
-document.getElementById('headerDate').textContent =
-  `${DAYS_DE[today.getDay()]}, ${today.getDate()}. ${MONTHS_DE[today.getMonth()]} ${today.getFullYear()}`;
+function renderHeaderDate() {
+  document.getElementById('headerDate').textContent =
+    `${DAYS_DE[today.getDay()]}, ${today.getDate()}. ${MONTHS_DE[today.getMonth()]} ${today.getFullYear()}`;
+}
+renderHeaderDate();
+
+function refreshToday() {
+  const now = startOfToday();
+  if (now.getTime() === today.getTime()) return;
+  today = now;
+  if (dateFilter && dateFilter < isoDate(today)) dateFilter = null;
+  renderHeaderDate();
+  renderAll();
+  const item = getCurrentItem();
+  const sidebar = document.getElementById('detailSidebar');
+  if (item && !sidebar.contains(document.activeElement)) renderDetailSidebar(item);
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') refreshToday(); });
+window.addEventListener('focus', refreshToday);
+setInterval(refreshToday, 60 * 1000);
 
 // ═══════════ FILTER ═══════════
 function updateFilterLabels() {
@@ -828,6 +865,45 @@ function exportData() {
   document.body.appendChild(a); a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  backupMeta.lastExportAt = Date.now();
+  backupMeta.remindAfter = Date.now() + BACKUP_REMIND_DAYS * 86400000;
+  saveBackupMeta();
+  renderBackupNotice();
+}
+
+// Erinnerung ans Backup: die Daten liegen nur im Browser auf diesem Gerät.
+// Eigener localStorage-Schlüssel, damit Export/Import davon unberührt bleiben.
+const BACKUP_REMIND_DAYS = 14;
+const BACKUP_SNOOZE_DAYS = 3;
+let backupMeta = JSON.parse(localStorage.getItem('ws_backup') || 'null');
+if (!backupMeta) {
+  backupMeta = { lastExportAt: null, remindAfter: Date.now() + BACKUP_REMIND_DAYS * 86400000 };
+  saveBackupMeta();
+}
+function saveBackupMeta() { localStorage.setItem('ws_backup', JSON.stringify(backupMeta)); }
+function snoozeBackupNotice() {
+  backupMeta.remindAfter = Date.now() + BACKUP_SNOOZE_DAYS * 86400000;
+  saveBackupMeta();
+  renderBackupNotice();
+}
+function renderBackupNotice() {
+  const el = document.getElementById('backupNotice');
+  if (!items.length || Date.now() < backupMeta.remindAfter) { el.innerHTML = ''; return; }
+  const age = backupMeta.lastExportAt
+    ? `Dein letztes Backup ist ${Math.floor((Date.now() - backupMeta.lastExportAt) / 86400000)} Tage alt.`
+    : 'Du hast länger kein Backup gemacht.';
+  el.innerHTML = `<div class="notice">
+    <div class="notice-text">Zeit für ein Backup<span>${age} Deine Einträge sind nur auf diesem Gerät gespeichert.</span></div>
+    <div class="notice-actions">
+      <button class="btn-ghost" onclick="snoozeBackupNotice()">Später</button>
+      <button class="btn-primary" onclick="exportData()">Jetzt sichern</button>
+    </div>
+  </div>`;
+}
+
+// Bittet den Browser, die Daten nicht automatisch zu löschen, wenn Speicher knapp wird.
+if (navigator.storage && navigator.storage.persist) {
+  navigator.storage.persisted().then(p => p || navigator.storage.persist()).catch(() => {});
 }
 
 function openImport() {
@@ -1691,6 +1767,19 @@ document.getElementById('btnClear').addEventListener('click', () => {
   const data = getCurrentData();
   if (data) { data.drawing = ''; save(); }
 });
+// Beim Drehen des Tablets ändert sich die Breite: Zeichenfläche neu aufbauen,
+// sonst landen Striche versetzt und die Skizze wird verzerrt.
+let canvasResizeTimer = null;
+window.addEventListener('resize', () => {
+  clearTimeout(canvasResizeTimer);
+  canvasResizeTimer = setTimeout(() => {
+    const data = getCurrentData();
+    if (!data || drawing) return;
+    const dpr = window.devicePixelRatio || 1;
+    if (Math.floor(canvas.parentElement.getBoundingClientRect().width * dpr) === canvas.width) return;
+    initCanvas(data.drawing || '');
+  }, 150);
+});
 
 // ═══════════ UTIL ═══════════
 function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -1698,17 +1787,83 @@ function escapeAttr(s) { return escapeHtml(s); }
 function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); }));
 
-function renderAll() { updateFilterLabels(); renderStats(); renderCategories(); renderCal(); }
+function renderAll() { updateFilterLabels(); renderBackupNotice(); renderStats(); renderCategories(); renderCal(); }
 renderAll();
+
+// ═══════════ ZURÜCK-GESTE ═══════════
+// Solange die Detailseite oder ein Dialog offen ist, liegt genau ein zusätzlicher
+// History-Eintrag vorne. Die Zurück-Geste schließt dann die oberste Ebene,
+// statt die App zu verlassen.
+let ignoreNextPop = false;
+let historySyncQueued = false;
+function topLayer() {
+  const overlays = document.querySelectorAll('.overlay.open');
+  if (overlays.length) return overlays[overlays.length - 1];
+  const detail = document.getElementById('detailPage');
+  return detail.classList.contains('open') ? detail : null;
+}
+// Verzögert, damit z.B. „Dialog zu, Detailseite auf“ als ein Schritt zählt.
+function queueHistorySync() {
+  if (historySyncQueued) return;
+  historySyncQueued = true;
+  setTimeout(() => {
+    historySyncQueued = false;
+    const armed = !!(history.state && history.state.wsLayer);
+    if (topLayer() && !armed) history.pushState({ wsLayer: true }, '');
+    else if (!topLayer() && armed) { ignoreNextPop = true; history.back(); }
+  }, 0);
+}
+window.addEventListener('popstate', () => {
+  if (ignoreNextPop) { ignoreNextPop = false; return; }
+  closeCategoryMenu();
+  const layer = topLayer();
+  if (!layer) return;
+  if (layer.id === 'detailPage') closeDetail();
+  else if (layer.id === 'importConfirmModal') cancelImport();
+  else closeOverlay(layer.id);
+});
+const layerObserver = new MutationObserver(queueHistorySync);
+document.querySelectorAll('.overlay, #detailPage').forEach(el =>
+  layerObserver.observe(el, { attributes: true, attributeFilter: ['class'] }));
+queueHistorySync();
 
 // ═══════════ PWA / SERVICE WORKER ═══════════
 // Nur registrieren wenn über http(s) ausgeliefert (also auf GitHub Pages).
 // Bei lokalem file:// ist Service Worker eh nicht erlaubt — wird einfach übersprungen.
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (hadController) showUpdateNotice(); });
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(err => console.warn('SW-Registrierung fehlgeschlagen:', err));
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') reg.update().catch(() => {});
+      });
+    }).catch(err => console.warn('SW-Registrierung fehlgeschlagen:', err));
   });
 }
+
+// ═══════════ UPDATES ═══════════
+// Bleibt die App lange offen (z.B. im Hintergrund auf dem Tablet), wird beim
+// Zurückkehren geprüft, ob auf GitHub Pages eine neuere index.html liegt.
+const UPDATE_CHECK_INTERVAL_MS = 10 * 60 * 1000;
+let loadedPageText = null;
+let lastUpdateCheck = 0;
+function showUpdateNotice() { document.getElementById('updateToast').classList.add('open'); }
+function checkForUpdate() {
+  if (!location.protocol.startsWith('http')) return;
+  if (Date.now() - lastUpdateCheck < UPDATE_CHECK_INTERVAL_MS) return;
+  lastUpdateCheck = Date.now();
+  fetch('index.html', { cache: 'no-cache' })
+    .then(resp => resp.ok ? resp.text() : null)
+    .then(text => {
+      if (!text) return;
+      if (loadedPageText === null) loadedPageText = text;
+      else if (text !== loadedPageText) showUpdateNotice();
+    })
+    .catch(() => {});
+}
+checkForUpdate();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkForUpdate(); });
 </script>
 </body>
 </html>
