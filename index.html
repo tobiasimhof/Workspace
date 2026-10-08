@@ -24,9 +24,9 @@
     --radius:12px; --radius-sm:7px;
   }
   body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; font-size:14px; line-height:1.6; }
-  .shell { max-width:1480px; margin:0 auto; padding:28px 28px 60px; }
+  .shell { max-width:1480px; margin:0 auto; padding:28px 28px 110px; }
 
-  .main-layout { display:grid; grid-template-columns:220px 1fr; gap:20px; align-items:start; }
+  .main-layout { display:grid; grid-template-columns:260px 1fr; gap:20px; align-items:start; }
   .cal-sidebar { position:sticky; top:20px; }
   @media (max-width:760px) {
     .main-layout { grid-template-columns:1fr; gap:16px; }
@@ -37,7 +37,7 @@
   .header-left h1 { font-size:20px; font-weight:600; letter-spacing:-0.3px; }
   .header-left .date { font-size:12px; color:var(--muted); margin-top:2px; font-family:'DM Mono',monospace; }
 
-  .filter-wrap { display:flex; align-items:center; gap:6px; }
+  .filter-wrap { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .filter-bar { display:flex; align-items:center; gap:4px; background:var(--surface); border:1px solid var(--border); border-radius:99px; padding:4px; }
   .filter-btn { display:flex; align-items:center; gap:6px; padding:5px 11px; background:transparent; border:none; border-radius:99px; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--muted); cursor:pointer; transition:background 0.15s,color 0.15s; white-space:nowrap; }
   .filter-btn:hover { color:var(--text); }
@@ -96,6 +96,14 @@
   .item-dot.green { background:var(--green); }
   .item-dot.orange { background:var(--orange); }
   .item-dot.grey { background:var(--grey); }
+  .item-check { width:30px; height:30px; margin:-6px -6px -6px -8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:transparent; border:none; padding:0; border-radius:50%; cursor:pointer; color:#fff; }
+  .item-check span { width:18px; height:18px; border-radius:50%; border:2px solid var(--grey); display:flex; align-items:center; justify-content:center; transition:background 0.15s,border-color 0.15s; }
+  .item-check.orange span { border-color:var(--orange); }
+  .item-check.green span { border-color:var(--green); }
+  .item-check:hover span { background:rgba(0,0,0,0.05); }
+  .item-check.done span { background:var(--grey); border-color:var(--grey); }
+  .item-check svg { opacity:0; }
+  .item-check.done svg { opacity:1; }
   .item-title { font-size:13px; font-weight:500; line-height:1.35; display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
   .item-meta { font-size:11px; color:var(--muted); margin-top:2px; font-family:'DM Mono',monospace; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .repeat-icon { color:var(--muted); display:inline-flex; }
@@ -130,6 +138,34 @@
   .cal-wd { font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; font-family:'DM Mono',monospace; }
   .cal-num { font-size:15px; font-weight:500; margin-top:2px; }
   .cal-month { font-size:11px; color:var(--muted); margin-bottom:10px; font-family:'DM Mono',monospace; }
+  .cal-nav { display:flex; align-items:center; justify-content:space-between; gap:6px; margin-bottom:10px; }
+  .cal-nav .cal-month { margin-bottom:0; }
+  .cal-nav-btn { width:28px; height:28px; border-radius:50%; border:none; background:transparent; color:var(--muted); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+  .cal-nav-btn:hover { background:var(--bg); color:var(--text); }
+  .seg { display:flex; background:var(--bg); border:1px solid var(--border); border-radius:99px; padding:2px; flex-shrink:0; }
+  .seg button { border:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:11px; color:var(--muted); padding:3px 9px; border-radius:99px; cursor:pointer; }
+  .seg button.active { background:var(--surface); color:var(--text); font-weight:500; box-shadow:0 1px 2px rgba(0,0,0,0.08); }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .cal-grid .cal-wd { text-align:center; padding-bottom:4px; }
+  .cal-cell { aspect-ratio:1; display:flex; align-items:center; justify-content:center; font-size:12px; border-radius:50%; cursor:pointer; position:relative; transition:background 0.15s; }
+  .cal-cell:hover:not(.today) { background:var(--bg); }
+  .cal-cell.other { color:var(--muted); opacity:0.5; }
+  .cal-cell.today { background:var(--accent); color:#fff; font-weight:600; }
+  .cal-cell.selected:not(.today) { box-shadow:inset 0 0 0 1.5px var(--accent); }
+  .cal-cell.selected.today { box-shadow:inset 0 0 0 2px #fff; }
+  .cal-cell.has-event::after { content:''; width:4px; height:4px; border-radius:50%; background:var(--orange); position:absolute; bottom:3px; left:50%; transform:translateX(-50%); }
+  .cal-cell.today.has-event::after { background:#fff; }
+
+  /* ALS NÄCHSTES */
+  .next-card { margin-top:16px; }
+  .next-item { display:flex; align-items:flex-start; gap:10px; padding:8px 0; border-bottom:1px solid var(--border); cursor:pointer; }
+  .next-item:last-child { border-bottom:none; }
+  .next-item:hover .next-title { text-decoration:underline; }
+  .next-bar { width:3px; align-self:stretch; border-radius:2px; flex-shrink:0; }
+  .next-text { flex:1; min-width:0; }
+  .next-title { font-size:13px; font-weight:500; line-height:1.35; }
+  .next-meta { font-size:11px; color:var(--muted); font-family:'DM Mono',monospace; }
+  .next-item .tag { flex-shrink:0; margin-top:1px; }
 
   /* MODAL */
   .overlay { display:none; position:fixed; inset:0; background:rgba(26,25,23,0.45); z-index:300; align-items:center; justify-content:center; padding:20px; }
@@ -142,6 +178,8 @@
   .field label { display:block; font-size:11px; color:var(--muted); margin-bottom:4px; font-family:'DM Mono',monospace; }
   .field input, .field textarea, .field select { width:100%; padding:8px 10px; border:1px solid var(--border); border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); background:var(--bg); outline:none; transition:border-color 0.15s; resize:vertical; }
   .field input:focus, .field textarea:focus, .field select:focus { border-color:#AAA; }
+  .field-row { display:flex; gap:10px; }
+  .field-row .field { flex:1; min-width:0; }
   .modal-actions { display:flex; gap:8px; margin-top:18px; justify-content:flex-end; }
   .btn-primary { padding:8px 18px; background:var(--accent); color:#fff; border:none; border-radius:var(--radius-sm); font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:opacity 0.15s; }
   .btn-primary:hover { opacity:0.85; }
@@ -285,6 +323,17 @@
   .notice .btn-primary, .notice .btn-ghost { padding:6px 14px; }
   .toast { display:none; position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom)); transform:translateX(-50%); z-index:400; align-items:center; gap:12px; background:var(--accent); color:#fff; border-radius:99px; padding:6px 6px 6px 18px; font-size:13px; box-shadow:0 10px 28px rgba(0,0,0,0.2); white-space:nowrap; }
   .toast.open { display:flex; animation:slideUp 0.2s ease; }
+  .toast.plain { padding:10px 18px; }
+  #updateToast { top:calc(16px + env(safe-area-inset-top)); bottom:auto; }
+  @media (max-width:600px) { .toast { bottom:calc(92px + env(safe-area-inset-bottom)); } }
+
+  .search { display:flex; align-items:center; gap:6px; height:32px; padding:0 12px; background:var(--surface); border:1px solid var(--border); border-radius:99px; color:var(--muted); cursor:text; }
+  .search:focus-within { border-color:#AAA; }
+  .search input { border:none; outline:none; background:transparent; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text); width:140px; }
+  .search-empty { grid-column:1 / -1; font-size:13px; color:var(--muted); text-align:center; padding:40px 0; }
+
+  .fab { position:fixed; right:calc(24px + env(safe-area-inset-right)); bottom:calc(24px + env(safe-area-inset-bottom)); z-index:100; width:56px; height:56px; border-radius:50%; border:none; background:var(--accent); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 8px 24px rgba(0,0,0,0.22); transition:transform 0.15s; }
+  .fab:active { transform:scale(0.94); }
   .toast button { background:#fff; color:var(--accent); border:none; border-radius:99px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; }
 </style>
 </head>
@@ -298,6 +347,10 @@
       <div class="date" id="headerDate"></div>
     </div>
     <div class="filter-wrap">
+      <label class="search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="searchInput" placeholder="Suchen …" autocomplete="off" oninput="onSearchInput(this.value)">
+      </label>
       <div class="filter-bar" id="filterBar">
         <button class="filter-btn active" data-filter="all"><span class="filter-dot all"></span>Alle</button>
         <button class="filter-btn" data-filter="orange"><span class="filter-dot orange"></span><span id="orangeLabel">≤ 7 Tage</span></button>
@@ -305,7 +358,7 @@
         <button class="filter-btn" data-filter="grey"><span class="filter-dot grey"></span>Erledigt</button>
       </div>
       <button class="icon-btn plus" onclick="openNewCategory()" title="Neue Kategorie">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
       </button>
       <button class="icon-btn" onclick="exportData()" title="Daten exportieren">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -328,13 +381,36 @@
             <div class="card-icon" style="background:#F0EDE6;color:var(--accent)">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             </div>
-            <span class="card-title">Diese Woche</span>
+            <span class="card-title">Kalender</span>
+          </div>
+          <div class="seg" id="calViewToggle">
+            <button data-view="week" onclick="setCalView('week')">Woche</button>
+            <button data-view="month" onclick="setCalView('month')">Monat</button>
           </div>
         </div>
         <div class="card-body">
-          <div class="cal-month" id="calMonth"></div>
-          <div class="cal-strip" id="calStrip"></div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" id="calPrev" onclick="shiftCalMonth(-1)" title="Voriger Monat">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div class="cal-month" id="calMonth"></div>
+            <button class="cal-nav-btn" id="calNext" onclick="shiftCalMonth(1)" title="Nächster Monat">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+          <div id="calBody"></div>
         </div>
+      </div>
+      <div class="cal-card next-card">
+        <div class="card-head" style="cursor:default">
+          <div class="card-head-left">
+            <div class="card-icon" style="background:#F0EDE6;color:var(--accent)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <span class="card-title">Als Nächstes</span>
+          </div>
+        </div>
+        <div class="card-body" id="nextList"></div>
       </div>
     </aside>
     <div class="main-content">
@@ -343,6 +419,9 @@
       <div class="categories" id="categoriesGrid"></div>
     </div>
   </div>
+  <button class="fab" onclick="openAddItem()" title="Neuer Eintrag">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
 </div>
 
 <!-- UPDATE-HINWEIS -->
@@ -350,6 +429,8 @@
   Neue Version verfügbar
   <button onclick="location.reload()">Neu laden</button>
 </div>
+
+<div class="toast" id="toast"><span class="toast-text"></span><button></button></div>
 
 <!-- DETAIL -->
 <div id="detailPage" class="detail-page">
@@ -392,8 +473,13 @@
   <div class="modal">
     <h2 id="addItemTitle">Neuer Eintrag</h2>
     <p class="modal-sub">Nur das Wesentliche — Details ergänzt du gleich auf der Eintragsseite.</p>
-    <div class="field"><label>Titel</label><input id="newTitle" type="text" placeholder="z.B. Trikot kaufen, Hausarbeit BWL, Training …"></div>
-    <div class="field"><label>Datum (optional)</label><input id="newDate" type="date"></div>
+    <div class="field"><label>Titel</label><input id="newTitle" type="text" placeholder="z.B. Klausur Statistik, Hausarbeit BWL, Training …"></div>
+    <div class="field"><label>Kategorie</label><select id="newCategory" onchange="onNewCategoryChange()"></select></div>
+    <div class="field-row">
+      <div class="field"><label>Datum (optional)</label><input id="newDate" type="date"></div>
+      <div class="field" id="newTimeField"><label>Uhrzeit (optional)</label><input id="newTime" type="time"></div>
+    </div>
+    <div class="field" id="newLocationField"><label>Ort (optional)</label><input id="newLocation" type="text" placeholder="z.B. Raum H2, Audimax"></div>
     <div class="field">
       <label>Wiederholung</label>
       <select id="newRecurrence" onchange="onRecurrenceChange()">
@@ -568,6 +654,7 @@ const COLOR_PRESETS = [
   { bg:'#E4F0F2', fg:'#2D7A85' }, { bg:'#F0EDE6', fg:'#5A5A50' },
 ];
 
+const CHECK_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
 const REPEAT_SVG = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
 
 // ═══════════ STATE ═══════════
@@ -605,8 +692,33 @@ if (!categories) {
   save();
 }
 
-items.forEach(i => { if (!i.fields) i.fields = []; });
+if (migrateItems(items)) save();
 categories.forEach(c => { if (!c.width) c.width = 'normal'; });
+
+// Eigene Felder „Uhrzeit“ und „Ort“ (angelegt, bevor es echte Felder dafür gab)
+// werden in item.time / item.location übernommen. Eine Uhrzeit nur, wenn sie
+// eindeutig lesbar ist (z.B. „10:00“, „9.30“, „14 Uhr“), sonst bleibt das Feld.
+function parseTime(s) {
+  const m = String(s || '').trim().match(/^(\d{1,2})(?:[:.](\d{2}))?\s*(?:uhr)?$/i);
+  if (!m) return null;
+  const h = Number(m[1]), min = Number(m[2] || 0);
+  if (h > 23 || min > 59) return null;
+  return `${String(h).padStart(2,'0')}:${String(min).padStart(2,'0')}`;
+}
+function migrateItems(list) {
+  let changed = false;
+  list.forEach(item => {
+    if (!item.fields) { item.fields = []; changed = true; }
+    item.fields = item.fields.filter(f => {
+      const name = String(f.name || '').trim().toLowerCase();
+      const value = String(f.value || '').trim();
+      if (name === 'uhrzeit' && !item.time && parseTime(value)) { item.time = parseTime(value); changed = true; return false; }
+      if (name === 'ort' && !item.location && value) { item.location = value; changed = true; return false; }
+      return true;
+    });
+  });
+  return changed;
+}
 
 function save() {
   localStorage.setItem('ws_categories', JSON.stringify(categories));
@@ -640,6 +752,10 @@ function fmtDate(dateStr) {
   if (!dateStr) return 'kein Datum';
   const d = parseISO(dateStr);
   return `${d.getDate()}. ${MONTHS_DE[d.getMonth()].slice(0,3)} ${d.getFullYear()}`;
+}
+function fmtDateShort(dateStr) {
+  const d = parseISO(dateStr);
+  return `${DAYS_DE[d.getDay()]}, ${d.getDate()}. ${MONTHS_DE[d.getMonth()].slice(0,3)}`;
 }
 function fmtDateLong(dateStr) {
   if (!dateStr) return 'kein Datum';
@@ -732,7 +848,10 @@ function getCardEntries(catItems, cat) {
     const horizonEnd = new Date(today);
     horizonEnd.setDate(today.getDate() + 6);
     catItems.forEach(item => {
-      if (item.recurrence) {
+      if (item.recurrence && dateFilter) {
+        const day = parseISO(dateFilter);
+        getOccurrencesInRange(item, day, day).forEach(date => out.push({ item, date }));
+      } else if (item.recurrence) {
         const occs = getOccurrencesInRange(item, today, horizonEnd);
         const visible = occs.filter(d => !getOccurrenceDoneStatus(item, d));
         if (visible.length) {
@@ -816,6 +935,19 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
     renderAll();
   });
 });
+let searchQuery = '';
+function onSearchInput(value) {
+  searchQuery = value.trim().toLowerCase();
+  renderCategories();
+}
+function searchMatch(item, date) {
+  if (!searchQuery) return true;
+  const occ = item.recurrence && item.occurrences && item.occurrences[date];
+  const parts = [item.title, item.notes, item.location, item.time];
+  (item.fields || []).forEach(f => parts.push(f.name, f.value));
+  if (occ) { parts.push(occ.notes); (occ.fields || []).forEach(f => parts.push(f.name, f.value)); }
+  return parts.filter(Boolean).join(' ').toLowerCase().includes(searchQuery);
+}
 function filterMatch(urgency, entryDate) {
   if (currentFilter !== 'all' && currentFilter !== urgency) return false;
   if (dateFilter && entryDate !== dateFilter) return false;
@@ -962,7 +1094,7 @@ function confirmImport() {
   categories = pendingImport.categories;
   items = pendingImport.items;
   settings = Object.assign({ orangeDays:7, greenDays:14 }, pendingImport.settings);
-  items.forEach(i => { if (!i.fields) i.fields = []; });
+  migrateItems(items);
   pendingImport = null;
   save();
   closeOverlay('importConfirmModal');
@@ -981,9 +1113,10 @@ function renderCategories() {
     const color = COLOR_PRESETS[cat.color] || COLOR_PRESETS[0];
     const catItems = items.filter(i => i.categoryId === cat.id);
     const allEntries = getCardEntries(catItems, cat);
-    const filtered = allEntries.filter(e => filterMatch(getUrgency(e.item, cat, e.date), e.date));
+    const filtered = allEntries.filter(e => filterMatch(getUrgency(e.item, cat, e.date), e.date) && searchMatch(e.item, e.date));
+    if (searchQuery && !filtered.length) return;
     const card = document.createElement('div');
-    card.className = 'card w-' + (cat.width || 'normal') + (cat.collapsed ? ' minimized' : '');
+    card.className = 'card w-' + (cat.width || 'normal') + (cat.collapsed && !searchQuery ? ' minimized' : '');
     card.dataset.catId = cat.id;
     card.innerHTML = `
       <div class="card-head" onclick="toggleCollapse('${cat.id}')" onpointerdown="onCardHeadPointerDown(event, '${cat.id}')" title="Tippen zum Ein-/Ausklappen · Lang drücken zum Verschieben">
@@ -1001,7 +1134,7 @@ function renderCategories() {
       </div>
       <div class="card-body">
         <div class="cat-items"></div>
-        <button class="btn-add" onclick="openAddItem('${cat.id}')">
+        <button class="btn-add" onclick="event.stopPropagation(); openAddItem('${cat.id}')">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Eintrag hinzufügen
         </button>
@@ -1017,6 +1150,9 @@ function renderCategories() {
     grid.appendChild(card);
     renderCategoryItems(card.querySelector('.cat-items'), cat, filtered);
   });
+  if (searchQuery && !grid.children.length) {
+    grid.innerHTML = `<div class="search-empty">Keine Treffer für „${escapeHtml(searchQuery)}“</div>`;
+  }
 }
 
 function renderCategoryItems(container, cat, entries) {
@@ -1026,7 +1162,7 @@ function renderCategoryItems(container, cat, entries) {
       const bd = getOccurrenceDoneStatus(b.item, b.date);
       if (ad && !bd) return 1;
       if (!ad && bd) return -1;
-      return new Date(a.date || '9999-12-31') - new Date(b.date || '9999-12-31');
+      return entrySortKey(a).localeCompare(entrySortKey(b));
     });
     if (!sorted.length) { container.innerHTML = '<div class="empty">Keine Einträge in dieser Ansicht</div>'; return; }
     container.innerHTML = sorted.map(entry => {
@@ -1048,11 +1184,15 @@ function renderCategoryItems(container, cat, entries) {
                    || (item.fields && item.fields[0] && item.fields[0].value)
                    || (data.notes ? data.notes.split('\n')[0] : '')
                    || (item.notes ? item.notes.split('\n')[0] : '');
+      const marker = cat.layout === 'task'
+        ? `<button class="item-check ${u} ${done?'done':''}" onclick="toggleDone(event, ${item.id}, '${displayDate||''}')" title="${done?'Wieder öffnen':'Als erledigt markieren'}"><span>${CHECK_SVG}</span></button>`
+        : `<div class="item-dot ${u}"></div>`;
+      const meta = [fmtDate(displayDate), item.time, item.location, preview].filter(Boolean).map(escapeHtml).join(' · ');
       return `<div class="item ${done?'done':''}" onclick="openDetail(${item.id}, '${displayDate||''}')">
-        <div class="item-dot ${u}"></div>
+        ${marker}
         <div style="flex:1; min-width:0">
           <div class="item-title">${repeat}${escapeHtml(item.title)}${tag}</div>
-          <div class="item-meta">${fmtDate(displayDate)}${preview ? ' · '+escapeHtml(preview) : ''}</div>
+          <div class="item-meta">${meta}</div>
         </div>
       </div>`;
     }).join('');
@@ -1102,35 +1242,157 @@ function renderStats() {
   bar.innerHTML = html;
 }
 
-function renderCal() {
-  const strip = document.getElementById('calStrip');
-  const end = new Date(today); end.setDate(today.getDate() + 6);
-  const eventDates = new Set();
+function entrySortKey(e) { return (e.date || '9999-12-31') + ' ' + (e.item.time || '99:99'); }
+
+// Ansicht des Kalenders (Woche/Monat) — nur Bedienkomfort, daher eigener Schlüssel.
+let ui = Object.assign({ calView: 'week' }, JSON.parse(localStorage.getItem('ws_ui') || '{}'));
+let calMonthOffset = 0;
+function setCalView(view) {
+  ui.calView = view; calMonthOffset = 0;
+  localStorage.setItem('ws_ui', JSON.stringify(ui));
+  renderCal();
+}
+function shiftCalMonth(delta) { calMonthOffset += delta; renderCal(); }
+
+function eventDatesInRange(from, to) {
+  const dates = new Set();
   items.forEach(i => {
     const cat = categories.find(c => c.id === i.categoryId);
     if (!cat) return;
-    const occs = getOccurrencesInRange(i, today, end);
-    occs.forEach(d => {
+    getOccurrencesInRange(i, from, to).forEach(d => {
       if (cat.layout === 'task' && getOccurrenceDoneStatus(i, d)) return;
-      eventDates.add(d);
+      dates.add(d);
     });
   });
-  let html = '';
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(today); d.setDate(today.getDate()+i);
+  return dates;
+}
+
+function renderCal() {
+  const body = document.getElementById('calBody');
+  const isMonth = ui.calView === 'month';
+  document.querySelectorAll('#calViewToggle button').forEach(b => b.classList.toggle('active', b.dataset.view === ui.calView));
+  document.getElementById('calPrev').style.visibility = isMonth ? 'visible' : 'hidden';
+  document.getElementById('calNext').style.visibility = isMonth ? 'visible' : 'hidden';
+  if (!isMonth) {
+    const end = new Date(today); end.setDate(today.getDate() + 6);
+    const eventDates = eventDatesInRange(today, end);
+    document.getElementById('calMonth').textContent = `${MONTHS_DE[today.getMonth()]} ${today.getFullYear()}`;
+    let html = '';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today); d.setDate(today.getDate()+i);
+      const iso = isoDate(d);
+      const cls = ['cal-day'];
+      if (i === 0) cls.push('today');
+      if (eventDates.has(iso)) cls.push('has-event');
+      if (dateFilter === iso) cls.push('selected');
+      html += `<div class="${cls.join(' ')}" onclick="toggleDateFilter('${iso}')">
+        <div class="cal-wd">${DAYS_DE[d.getDay()]}</div>
+        <div class="cal-num">${d.getDate()}</div>
+      </div>`;
+    }
+    body.innerHTML = `<div class="cal-strip">${html}</div>`;
+    return;
+  }
+  const first = new Date(today.getFullYear(), today.getMonth() + calMonthOffset, 1);
+  const last = new Date(first.getFullYear(), first.getMonth() + 1, 0);
+  const gridStart = new Date(first); gridStart.setDate(1 - ((first.getDay() + 6) % 7));
+  const gridEnd = new Date(last); gridEnd.setDate(last.getDate() + (6 - (last.getDay() + 6) % 7));
+  const eventDates = eventDatesInRange(gridStart, gridEnd);
+  document.getElementById('calMonth').textContent = `${MONTHS_DE[first.getMonth()]} ${first.getFullYear()}`;
+  let html = ['Mo','Di','Mi','Do','Fr','Sa','So'].map(w => `<div class="cal-wd">${w}</div>`).join('');
+  const todayIso = isoDate(today);
+  for (const d = new Date(gridStart); d <= gridEnd; d.setDate(d.getDate() + 1)) {
     const iso = isoDate(d);
-    if (i === 0) document.getElementById('calMonth').textContent = `${MONTHS_DE[d.getMonth()]} ${d.getFullYear()}`;
-    const cls = ['cal-day'];
-    if (i === 0) cls.push('today');
+    const cls = ['cal-cell'];
+    if (d.getMonth() !== first.getMonth()) cls.push('other');
+    if (iso === todayIso) cls.push('today');
     if (eventDates.has(iso)) cls.push('has-event');
     if (dateFilter === iso) cls.push('selected');
-    html += `<div class="${cls.join(' ')}" onclick="toggleDateFilter('${iso}')">
-      <div class="cal-wd">${DAYS_DE[d.getDay()]}</div>
-      <div class="cal-num">${d.getDate()}</div>
-    </div>`;
+    html += `<div class="${cls.join(' ')}" onclick="toggleDateFilter('${iso}')">${d.getDate()}</div>`;
   }
-  strip.innerHTML = html;
+  body.innerHTML = `<div class="cal-grid">${html}</div>`;
 }
+
+// Die nächsten anstehenden Termine über alle Kategorien (ohne Bewerbungs-Status-Bahn).
+// Wiederkehrende Einträge erscheinen nur mit ihrem nächsten offenen Termin.
+const NEXT_LIMIT = 5;
+function renderNext() {
+  const horizon = new Date(today); horizon.setDate(today.getDate() + 60);
+  const entries = [];
+  items.forEach(item => {
+    const cat = categories.find(c => c.id === item.categoryId);
+    if (!cat || cat.layout === 'status') return;
+    if (item.recurrence) {
+      const date = getOccurrencesInRange(item, today, horizon).find(d => !getOccurrenceDoneStatus(item, d));
+      if (date) entries.push({ item, cat, date });
+    } else if (item.date) {
+      const diff = daysDiff(item.date);
+      const done = cat.layout === 'task' && item.done;
+      if (!done && (diff >= 0 || cat.layout === 'task')) entries.push({ item, cat, date: item.date });
+    }
+  });
+  entries.sort((a, b) => entrySortKey(a).localeCompare(entrySortKey(b)));
+  const list = document.getElementById('nextList');
+  if (!entries.length) { list.innerHTML = '<div class="empty">Keine anstehenden Termine</div>'; return; }
+  list.innerHTML = entries.slice(0, NEXT_LIMIT).map(({ item, cat, date }) => {
+    const diff = daysDiff(date);
+    const color = COLOR_PRESETS[cat.color] || COLOR_PRESETS[0];
+    let when;
+    if (diff < 0)        when = '<span class="tag tag-orange">überfällig</span>';
+    else if (diff === 0) when = '<span class="tag tag-orange">heute</span>';
+    else if (diff === 1) when = '<span class="tag tag-orange">morgen</span>';
+    else                 when = `<span class="tag ${diff <= settings.orangeDays ? 'tag-orange' : 'tag-grey'}">in ${diff} T.</span>`;
+    const meta = [fmtDateShort(date), item.time, item.location].filter(Boolean).map(escapeHtml).join(' · ');
+    return `<div class="next-item" onclick="openDetail(${item.id}, '${date}')">
+      <span class="next-bar" style="background:${color.fg}"></span>
+      <div class="next-text">
+        <div class="next-title">${escapeHtml(item.title)}</div>
+        <div class="next-meta">${meta}</div>
+      </div>
+      ${when}
+    </div>`;
+  }).join('');
+}
+
+// ═══════════ ABHAKEN & RÜCKGÄNGIG ═══════════
+function toggleDone(ev, itemId, date) {
+  ev.stopPropagation();
+  const item = items.find(i => i.id === itemId);
+  if (!item) return;
+  const snapshot = takeSnapshot();
+  const data = item.recurrence ? getOccurrenceData(item, date) : item;
+  data.done = !data.done;
+  save(); renderAll();
+  if (data.done) showUndoToast(`„${item.title}“ erledigt`, snapshot);
+}
+
+function takeSnapshot() { return JSON.stringify({ categories, items }); }
+function restoreSnapshot(snapshot) {
+  const data = JSON.parse(snapshot);
+  categories = data.categories; items = data.items;
+  save();
+  if (currentDetail) {
+    if (items.some(i => i.id === currentDetail)) openDetail(currentDetail, currentOccurrenceDate);
+    else closeDetail();
+  }
+  renderAll();
+}
+
+let toastTimer = null;
+function showToast(text, actionLabel, onAction) {
+  const el = document.getElementById('toast');
+  const btn = el.querySelector('button');
+  el.querySelector('.toast-text').textContent = text;
+  el.classList.toggle('plain', !actionLabel);
+  btn.style.display = actionLabel ? '' : 'none';
+  btn.textContent = actionLabel || '';
+  btn.onclick = () => { hideToast(); onAction(); };
+  el.classList.add('open');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, actionLabel ? 6000 : 3000);
+}
+function hideToast() { document.getElementById('toast').classList.remove('open'); }
+function showUndoToast(text, snapshot) { showToast(text, 'Rückgängig', () => restoreSnapshot(snapshot)); }
 
 // ═══════════ COLLAPSE & MENU ═══════════
 function toggleCollapse(catId) {
@@ -1373,23 +1635,33 @@ function confirmDeleteCategory(catId) {
   const cat = categories.find(c => c.id === catId);
   if (!cat) return;
   const count = items.filter(i => i.categoryId === catId).length;
-  const msg = count > 0 ? `Kategorie „${cat.name}" und ${count} Eintrag/Einträge wirklich löschen?` : `Kategorie „${cat.name}" wirklich löschen?`;
-  if (!confirm(msg)) return;
+  const snapshot = takeSnapshot();
   categories = categories.filter(c => c.id !== catId);
   items = items.filter(i => i.categoryId !== catId);
   save(); renderAll();
+  const what = count === 1 ? ' mit 1 Eintrag' : count > 1 ? ` mit ${count} Einträgen` : '';
+  showUndoToast(`Kategorie „${cat.name}“${what} gelöscht`, snapshot);
 }
 function deleteCategory() { if (editingCategory) { confirmDeleteCategory(editingCategory); closeOverlay('categoryModal'); } }
 
 // ═══════════ ADD ITEM ═══════════
 let addingToCategory = null;
+// Ohne catId (z.B. vom +-Button) wird die zuletzt benutzte Kategorie vorgeschlagen.
 function openAddItem(catId) {
-  event.stopPropagation();
+  if (!categories.length) { openNewCategory(); return; }
+  if (!categories.some(c => c.id === catId)) {
+    catId = categories.some(c => c.id === ui.lastCategory) ? ui.lastCategory
+          : (categories.find(c => c.layout === 'task') || categories[0]).id;
+  }
   addingToCategory = catId;
-  const cat = categories.find(c => c.id === catId);
-  document.getElementById('addItemTitle').textContent = `Neuer Eintrag — ${cat.name}`;
+  document.getElementById('addItemTitle').textContent = 'Neuer Eintrag';
+  document.getElementById('newCategory').innerHTML = categories
+    .map(c => `<option value="${c.id}" ${c.id === catId ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('');
+  onNewCategoryChange();
   document.getElementById('newTitle').value = '';
-  document.getElementById('newDate').value = '';
+  document.getElementById('newDate').value = dateFilter || '';
+  document.getElementById('newTime').value = '';
+  document.getElementById('newLocation').value = '';
   document.getElementById('newNotes').value = '';
   document.getElementById('newRecurrence').value = 'none';
   document.getElementById('newInterval').value = '1';
@@ -1398,6 +1670,13 @@ function openAddItem(catId) {
   document.getElementById('recurFieldsBlock').style.display = 'none';
   document.getElementById('addItemModal').classList.add('open');
   setTimeout(() => document.getElementById('newTitle').focus(), 50);
+}
+function onNewCategoryChange() {
+  addingToCategory = document.getElementById('newCategory').value;
+  const cat = categories.find(c => c.id === addingToCategory);
+  const showTimeLoc = cat && cat.layout !== 'status';
+  document.getElementById('newTimeField').style.display = showTimeLoc ? '' : 'none';
+  document.getElementById('newLocationField').style.display = showTimeLoc ? '' : 'none';
 }
 function onRecurrenceChange() {
   const v = document.getElementById('newRecurrence').value;
@@ -1429,10 +1708,16 @@ function saveNewItem() {
     notes: document.getElementById('newNotes').value.trim(),
     drawing: '', fields: []
   };
+  if (cat.layout !== 'status') {
+    const time = document.getElementById('newTime').value;
+    const location = document.getElementById('newLocation').value.trim();
+    if (time) newItem.time = time;
+    if (location) newItem.location = location;
+  }
   if (recType === 'weekly') {
     const weekdays = Array.from(pickedWeekdays);
     if (!weekdays.length) {
-      alert('Bitte mindestens einen Wochentag auswählen.');
+      showToast('Bitte mindestens einen Wochentag auswählen.');
       return;
     }
     newItem.recurrence = {
@@ -1447,6 +1732,8 @@ function saveNewItem() {
   // neutral: weder done noch status
   items.push(newItem);
   save();
+  ui.lastCategory = cat.id;
+  localStorage.setItem('ws_ui', JSON.stringify(ui));
   closeOverlay('addItemModal');
   renderAll();
   openDetail(newItem.id);
@@ -1490,13 +1777,16 @@ function closeDetail() {
   renderAll();
 }
 function deleteCurrent() {
-  if (!confirm('Diesen Eintrag wirklich löschen? (Bei wiederkehrenden Einträgen wird die gesamte Serie gelöscht.)')) return;
+  const item = getCurrentItem();
+  if (!item) return;
+  const snapshot = takeSnapshot();
   items = items.filter(i => i.id !== currentDetail);
   save();
   document.getElementById('detailPage').classList.remove('open');
   document.getElementById('mainView').style.display = 'block';
   currentDetail = null; currentOccurrenceDate = null;
   renderAll();
+  showUndoToast(item.recurrence ? `Serie „${item.title}“ gelöscht` : `„${item.title}“ gelöscht`, snapshot);
 }
 
 function renderDetailSidebar(item) {
@@ -1521,6 +1811,10 @@ function renderDetailSidebar(item) {
          </button>
        </div></div>`;
 
+  const timeLocRows = `
+    <div class="meta-row"><div class="meta-label">Uhrzeit</div><div class="meta-value"><input type="time" id="metaTime" value="${escapeAttr(item.time || '')}"></div></div>
+    <div class="meta-row"><div class="meta-label">Ort</div><div class="meta-value"><input type="text" id="metaLocation" value="${escapeAttr(item.location || '')}" placeholder="z.B. Raum H2"></div></div>`;
+
   if (cat.layout === 'task') {
     const displayDate = item.recurrence ? currentOccurrenceDate : item.date;
     const diff = daysDiff(displayDate);
@@ -1538,6 +1832,7 @@ function renderDetailSidebar(item) {
     topHtml = `
       <div class="detail-title"><input type="text" id="metaTitle" value="${escapeAttr(item.title)}"></div>
       <div class="meta-row"><div class="meta-label">${dateLabel}</div><div class="meta-value">${dateInput}</div></div>
+      ${timeLocRows}
       ${recurRow}
       <div class="meta-row"><div class="meta-label">Status</div><div class="meta-value">
         <select id="metaDone">
@@ -1566,6 +1861,7 @@ function renderDetailSidebar(item) {
     topHtml = `
       <div class="detail-title"><input type="text" id="metaTitle" value="${escapeAttr(item.title)}"></div>
       <div class="meta-row"><div class="meta-label">${dateLabel}</div><div class="meta-value">${dateInput}</div></div>
+      ${timeLocRows}
       ${recurRow}
       <div class="countdown ${cdClass}">
         <div class="countdown-num">${cdNum}</div>
@@ -1612,6 +1908,17 @@ function renderDetailSidebar(item) {
   sb.innerHTML = topHtml + customHtml;
 
   document.getElementById('metaTitle').addEventListener('input', e => { item.title = e.target.value; save(); });
+  const metaTime = document.getElementById('metaTime');
+  if (metaTime) metaTime.addEventListener('change', e => {
+    if (e.target.value) item.time = e.target.value; else delete item.time;
+    save();
+  });
+  const metaLocation = document.getElementById('metaLocation');
+  if (metaLocation) metaLocation.addEventListener('input', e => {
+    const v = e.target.value.trim();
+    if (v) item.location = v; else delete item.location;
+    save();
+  });
   if (!item.recurrence) {
     const md = document.getElementById('metaDate');
     if (md) md.addEventListener('change', e => { item.date = e.target.value; save(); renderDetailSidebar(item); });
@@ -1639,8 +1946,10 @@ function renderDetailSidebar(item) {
   document.querySelectorAll('.custom-field-delete').forEach(btn => {
     btn.addEventListener('click', e => {
       const idx = parseInt(e.target.dataset.idx);
-      if (!confirm(`Feld "${data.fields[idx].name||'(unbenannt)'}" löschen?`)) return;
+      const snapshot = takeSnapshot();
+      const name = data.fields[idx].name;
       data.fields.splice(idx, 1); save(); renderDetailSidebar(item);
+      showUndoToast(name ? `Feld „${name}“ gelöscht` : 'Feld gelöscht', snapshot);
     });
   });
   document.getElementById('btnAddField').addEventListener('click', () => {
@@ -1683,7 +1992,7 @@ function saveRecurEdit() {
     // Keep occurrences data but they'll be unused; keep for history.
   } else {
     const wds = Array.from(editPickedWeekdays);
-    if (!wds.length) { alert('Bitte mindestens einen Wochentag wählen.'); return; }
+    if (!wds.length) { showToast('Bitte mindestens einen Wochentag wählen.'); return; }
     item.recurrence = {
       type: 'weekly',
       weekdays: wds,
@@ -1761,11 +2070,13 @@ document.getElementById('canvasTools').addEventListener('click', e => {
   if (btn.dataset.color) currentColor = btn.dataset.color;
 });
 document.getElementById('btnClear').addEventListener('click', () => {
-  if (!confirm('Skizze leeren?')) return;
+  const data = getCurrentData();
+  if (!data) return;
+  const snapshot = takeSnapshot();
   const rect = canvas.parentElement.getBoundingClientRect();
   ctx.clearRect(0, 0, rect.width, rect.height);
-  const data = getCurrentData();
-  if (data) { data.drawing = ''; save(); }
+  data.drawing = ''; save();
+  showUndoToast('Skizze geleert', snapshot);
 });
 // Beim Drehen des Tablets ändert sich die Breite: Zeichenfläche neu aufbauen,
 // sonst landen Striche versetzt und die Skizze wird verzerrt.
@@ -1787,7 +2098,7 @@ function escapeAttr(s) { return escapeHtml(s); }
 function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); }));
 
-function renderAll() { updateFilterLabels(); renderBackupNotice(); renderStats(); renderCategories(); renderCal(); }
+function renderAll() { updateFilterLabels(); renderBackupNotice(); renderStats(); renderCategories(); renderCal(); renderNext(); }
 renderAll();
 
 // ═══════════ ZURÜCK-GESTE ═══════════
